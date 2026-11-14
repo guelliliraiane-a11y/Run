@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d0e12">
+<title>PACE LAB</title>
+<style>
+:root{--bg:#0d0e12;--panel:#171920;--panel2:#20232c;--line:#303440;--txt:#f5f6f8;--muted:#9da3b2;--red:#ff3b4e;--green:#52d6a0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 -apple-system,BlinkMacSystemFont,sans-serif}
+header{padding:22px 18px 14px;background:linear-gradient(135deg,#241018,#111218);border-bottom:1px solid var(--line)}
+.brand{font-size:12px;letter-spacing:3px;color:#ff7c89;font-weight:800}
+h1{margin:4px 0;font-size:25px}
+nav{display:flex;gap:8px;overflow:auto;padding:12px;background:var(--bg);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap;background:transparent;color:var(--muted);border:1px solid var(--line);padding:9px 12px;border-radius:10px;font-weight:700}
+nav button.active{background:var(--red);color:white}
+main{max-width:760px;margin:auto;padding:18px 14px 50px}
+.view{display:none}.view.active{display:block}
+h2{font-size:21px;margin:4px 0 14px}
+h3{font-size:15px;margin:0 0 12px}
+.sub,.hint{color:var(--muted);font-size:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:11px}
+label{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{width:100%;background:#101218;color:var(--txt);border:1px solid #363b49;border-radius:10px;padding:11px;font:inherit;min-width:0}
+.btn{border:0;background:var(--red);color:white;font-weight:800;padding:12px 15px;border-radius:11px}
+.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--txt)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.metric{background:var(--panel2);padding:12px;border-radius:12px}
+.metric small{display:block;color:var(--muted);font-size:11px}
+.metric strong{display:block;font-size:21px;margin-top:3px}
+.list-item{padding:13px 0;border-bottom:1px solid var(--line)}
+.item-head,.split{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.tag{font-size:11px;color:#ff9aa4;background:#3b1d26;padding:4px 8px;border-radius:20px}
+.empty{color:var(--muted);text-align:center;padding:25px}
+.score{font-size:30px;font-weight:900;color:var(--green)}
+footer{text-align:center;color:#747b8b;font-size:11px;padding:25px}
+@media(min-width:600px){.metrics{grid-template-columns:repeat(4,1fr)}nav{justify-content:center}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">PACE LAB</div>
+<h1>Mon entraînement</h1>
+</header>
+
+<nav>
+<button class="active" data-tab="create">＋ Programmer</button>
+<button data-tab="history">Historique</button>
+<button data-tab="import">Importer</button>
+<button data-tab="stats">Progression</button>
+</nav>
+
+<main>
+<section id="create" class="view active">
+<h2>Programmer une séance</h2>
+<p class="sub">Les calculs se mettent à jour automatiquement.</p>
+
+<form id="workoutForm">
+<div class="card">
+<h3>Informations générales</h3>
+<div class="grid">
+<div class="field">
+<label>DATE</label><input id="date" type="date" required>
+</div>
+<div class="field">
+<label>TYPE DE SÉANCE</label>
+<select id="type">
+<option>VMA</option>
+<option>Fractionné</option>
+<option>Sortie calme</option>
+</select>
+</div>
+</div>
+<div class="field">
+<label>NOM DE LA SÉANCE</label>
+<input id="name" placeholder="Ex. 8 × 400 m">
+</div>
+<div class="field">
+<label>NOTES / OBJECTIF</label>
+<textarea id="notes" rows="2"></textarea>
+</div>
+</div>
+
+<div class="card">
+<h3>Structure de la séance</h3>
+<div class="grid">
+<div class="field">
+<label>NOMBRE DE SÉRIES</label>
+<input id="sets" type="number" min="1" value="1">
+</div>
+<div class="field">
+<label>RÉPÉTITIONS / SÉRIE</label>
+<input id="reps" type="number" min="1" value="8">
+</div>
+<div class="field">
+<label>UNITÉ</label>
+<select id="unit">
+<option value="m">Mètres</option>
+<option value="km">Kilomètres</option>
+<option value="min">Minutes</option>
+</select>
+</div>
+<div class="field">
+<label>DISTANCE / DURÉE</label>
+<input id="distance" type="number" min="0.01" step="0.01" value="400">
+</div>
+</div>
+
+<div class="grid">
+<div class="field">
+<label>OBJECTIF</label>
+<select id="effortMode">
+<option value="time">Temps par répétition</option>
+<option value="pace">Allure au km</option>
+</select>
+</div>
+<div class="field">
+<label>TEMPS / ALLURE</label>
+<input id="effort" value="1:22">
+</div>
+</div>
+
+<div class="grid">
+<div class="field">
+<label>RÉCUPÉRATION ENTRE RÉPÉTITIONS</label>
+<input id="rest" value="1:00">
+</div>
+<div class="field">
+<label>RÉCUPÉRATION ENTRE SÉRIES</label>
+<input id="setRest" value="3:00">
+</div>
+</div>
+<p class="hint">Format des temps : minutes:secondes. Pas de récupération après la dernière répétition.</p>
+</div>
+
+<div class="card">
+<h3>Échauffement et retour au calme</h3>
+<div class="grid">
+<div class="field">
+<label>ÉCHAUFFEMENT (MIN)</label>
+<input id="warm" type="number" min="0" value="15">
+</div>
+<div class="field">
+<label>RETOUR AU CALME (MIN)</label>
+<input id="cool" type="number" min="0" value="10">
+</div>
+</div>
+<div class="field">
+<label>AUTRES TEMPS (MIN)</label>
+<input id="extra" type="number" min="0" value="0">
+</div>
+</div>
+
+<div class="card">
+<h3>Calcul automatique</h3>
+<div class="metrics">
+<div class="metric"><small>Allure au km</small><strong id="paceOut">3:25/km</strong></div>
+<div class="metric"><small>Distance effort</small><strong id="distanceOut">3,20 km</strong></div>
+<div class="metric"><small>Temps d'effort</small><strong id="effortOut">10:56</strong></div>
+<div class="metric"><small>Durée totale</small><strong id="totalOut">—</strong></div>
+</div>
+<p class="hint" id="breakdown"></p>
+</div>
+
+<div class="actions">
+<button class="btn" type="submit">Enregistrer la séance</button>
+<button class="btn secondary" type="reset">Réinitialiser</button>
+</div>
+</form>
+</section>
+
+<section id="history" class="view">
+<h2>Mes séances</h2>
+<div class="card">
+<div class="split">
+<strong id="historyCount">0 séance</strong>
+<button class="btn secondary" id="exportJSON">Exporter sauvegarde</button>
+</div>
+</div>
+<div class="card" id="historyList">
+<div class="empty">Aucune séance enregistrée.</div>
+</div>
+</section>
+
+<section id="import" class="view">
+<h2>Importer une activité</h2>
+<p class="sub">Import TCX ou GPX exporté depuis Strava.</p>
+<div class="card">
+<div class="field">
+<label>FICHIER D'ACTIVITÉ</label>
+<input id="activityFile" type="file" accept=".tcx,.gpx">
+</div>
+<p class="hint">Le TCX peut contenir les tours et la fréquence cardiaque. Le GPX contient principalement les données GPS.</p>
+<button class="btn" id="analyzeFile" type="button">Analyser le fichier</button>
+<div id="importResult" class="hint" style="margin-top:12px">Sélectionne d'abord une séance dans l'historique.</div>
+</div>
+</section>
+
+<section id="stats" class="view">
+<h2>Progression</h2>
+<div class="metrics">
+<div class="metric"><small>Séances</small><strong id="statCount">0</strong></div>
+<div class="metric"><small>Distance prévue</small><strong id="statDistance">0 km</strong></div>
+<div class="metric"><small>Note moyenne</small><strong id="statScore">—</strong></div>
+<div class="metric"><small>Activités importées</small><strong id="statImported">0</strong></div>
+</div>
+<div class="card" style="margin-top:13px">
+<h3>Dernières notes</h3>
+<div id="scoreHistory" class="empty">Aucune analyse disponible.</div>
+</div>
+</section>
+
+<footer>PACE LAB • Données conservées sur cet appareil</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const STORE='paceLabWorkoutsV1';
+let workouts=JSON.parse(localStorage.getItem(STORE)||'[]');
+let selectedId=null,pendingActivity=null;
+
+const now=new Date();
+$('date').value=new Date(now-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+function parseTime(s){
+ if(!s)return 0;
+ const p=s.trim().split(':').map(Number);
+ if(p.some(n=>!Number.isFinite(n)))return 0;
+ return p.length===1?p[0]:p[0]*60+p[1];
+}
+function fmt(sec){
+ sec=Math.max(0,Math.round(sec||0));
+ const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+ return h?`${h}h ${String(m).padStart(2,'0')}m`:`${m}:${String(s).padStart(2,'0')}`;
+}
+function paceFmt(sec){
+ if(!Number.isFinite(sec)||sec<=0)return'—';
+ sec=Math.round(sec);
+ return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}/km`;
+}
+
+function calculate(){
+ const sets=Math.max(1,+$('sets').value||1);
+ const reps=Math.max(1,+$('reps').value||1);
+ const unit=$('unit').value;
+ const value=Math.max(0,+$('distance').value||0);
+ const mode=$('effortMode').value;
+ const input=parseTime($('effort').value);
+
+ const km=unit==='m'?value/1000:unit==='km'?value:0;
+ const per=mode==='time'?input:km*input;
+ const pace=km>0?per/km:NaN;
+ const count=sets*reps;
+ const distance=km*count;
+ const effort=per*count;
+ const rest=parseTime($('rest').value);
+ const setRest=parseTime($('setRest').value);
+ const rests=Math.max(0,count-sets)*rest+Math.max(0,sets-1)*setRest;
+ const warm=(+$('warm').value||0)*60;
+ const cool=(+$('cool').value||0)*60;
+ const extra=(+$('extra').value||0)*60;
+ const total=effort+rests+warm+cool+extra;
+
+ $('paceOut').textContent=paceFmt(pace);
+ $('distanceOut').textContent=distance.toFixed(2).replace('.',',')+' km';
+ $('effortOut').textContent=fmt(effort);
+ $('totalOut').textContent=fmt(total);
+ $('breakdown').textContent=`Échauffement ${fmt(warm)} + efforts ${fmt(effort)} + récupérations ${fmt(rests)} + autres ${fmt(extra)} + retour au calme ${fmt(cool)}.`;
+
+ return {sets,reps,unit,value,km,mode,input,pace,distance,effort,rests,warm,cool,extra,total};
+}
+
+['sets','reps','unit','distance','effortMode','effort','rest','setRest','warm','cool','extra'].forEach(id=>{
+ $(id).addEventListener('input',calculate);
+ $(id).addEventListener('change',calculate);
+});
+
+function persist(){
+ localStorage.setItem(STORE,JSON.stringify(workouts));
+ render();
+}
+
+$('workoutForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const c=calculate();
+ const w={
+ id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+ date:$('date').value,
+ type:$('type').value,
+ name:$('name').value.trim()||$('type').value,
+ notes:$('notes').value,
+ sets:c.sets,reps:c.reps,unit:c.unit,value:c.value,
+ pace:c.pace,distance:c.distance,
+ effortSeconds:c.effort,estimatedSeconds:c.total,
+ restSeconds:parseTime($('rest').value),
+ setRestSeconds:parseTime($('setRest').value),
+ activity:null,score:null
+ };
+ workouts.unshift(w);
+ persist();
+ alert('Séance enregistrée !');
+ $('name').value='';
+ $('notes').value='';
+ switchTab('history');
+});
+
+function switchTab(id){
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+ if(id==='history'||id==='stats')render();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+
+function esc(s){
+ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function render(){
+ $('historyCount').textContent=workouts.length+' séance(s)';
+ $('historyList').innerHTML=workouts.length?workouts.map(w=>`
+ <div class="list-item">
+ <div class="item-head"><strong>${esc(w.name)}</strong><span class="tag">${esc(w.type)}</span></div>
+ <p class="hint">${esc(w.date)} • ${w.sets} série(s) × ${w.reps} • ${w.distance.toFixed(2)} km</p>
+ <div class="split"><span>${fmt(w.estimatedSeconds)} prévus</span><strong>${w.score===null?'À analyser':w.score+'/10'}</strong></div>
+ <div class="actions">
+ <button class="btn secondary" onclick="selectWorkout('${w.id}')">Associer activité</button>
+ <button class="btn ghost" onclick="deleteWorkout('${w.id}')">Supprimer</button>
+ </div></div>`).join(''):'<div class="empty">Aucune séance enregistrée.</div>';
+
+ $('statCount').textContent=workouts.length;
+ $('statDistance').textContent=workouts.reduce((a,w)=>a+w.distance,0).toFixed(1)+' km';
+ const scores=workouts.filter(w=>w.score!==null);
+ $('statScore').textContent=scores.length?(scores.reduce((a,w)=>a+w.score,0)/scores.length).toFixed(1)+'/10':'—';
+ $('statImported').textContent=workouts.filter(w=>w.activity).length;
+ $('scoreHistory').innerHTML=scores.length?scores.map(w=>`<div class="list-item split"><span>${esc(w.name)}</span><strong>${w.score}/10</strong></div>`).join(''):'<div class="empty">Aucune analyse disponible.</div>';
+}
+window.selectWorkout=id=>{
+ selectedId=id;
+ switchTab('import');
+ $('importResult').textContent='Séance sélectionnée : '+workouts.find(w=>w.id===id).name+'. Choisis ton fichier.';
+};
+window.deleteWorkout=id=>{
+ if(confirm('Supprimer cette séance ?')){
+ workouts=workouts.filter(w=>w.id!==id);
+ persist();
+ }
+};
+
+$('exportJSON').onclick=()=>{
+ const blob=new Blob([JSON.stringify(workouts,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='pace-lab-sauvegarde.json';
+ a.click();
+ URL.revokeObjectURL(a.href);
+};
+
+function haversine(a,b,c,d){
+ const r=Math.PI/180;
+ const x=Math.sin((c-a)*r/2)**2+
+ Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;
+ return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+function parseActivity(xml){
+ const doc=new DOMParser().parseFromString(xml,'application/xml');
+ if(doc.querySelector('parsererror'))throw Error('Fichier XML invalide.');
+ let distance=0,time=0,splits=[],hrs=[];
+ const laps=[...doc.getElementsByTagName('Lap')];
+ for(const lap of laps){
+  const d=+(lap.getAttribute('DistanceMeters')||0);
+  const t=+(lap.getElementsByTagName('TotalTimeSeconds')[0]?.textContent||0);
+  if(d>0&&t>0){
+   splits.push({distance:d,time:t,pace:t/(d/1000)});
+   distance+=d;time+=t;
+  }
+ }
+ const values=[...doc.getElementsByTagName('Value')];
+ values.forEach(n=>{const v=+n.textContent;if(v>35&&v<240)hrs.push(v)});
+ if(!distance){
+  const pts=[...doc.getElementsByTagName('trkpt')];
+  let prev=null;
+  for(const p of pts){
+   const lat=+p.getAttribute('lat'),lon=+p.getAttribute('lon');
+   const t=Date.parse(p.getElementsByTagName('time')[0]?.textContent||'');
+   if(prev){
+    const d=haversine(prev.lat,prev.lon,lat,lon);
+    const dt=t&&prev.t?(t-prev.t)/1000:0;
+    if(d>0&&d<100&&dt>=0){distance+=d;time+=dt}
+   }
+   prev={lat,lon,t};
+  }
+ }
+ if(!distance)throw Error('Aucune distance trouvée.');
+ return {distanceKm:distance/1000,timeSeconds:time,avgPace:time/(distance/1000),splits,avgHr:hrs.length?hrs.reduce((a,b)=>a+b,0)/hrs.length:null};
+}
+
+$('analyzeFile').onclick=async()=>{
+ const file=$('activityFile').files[0];
+ if(!file){$('importResult').textContent='Choisis un fichier.';return}
+ try{
+  pendingActivity=parseActivity(await file.text());
+  const a=pendingActivity;
+  let html=`Distance : ${a.distanceKm.toFixed(2)} km<br>Durée : ${fmt(a.timeSeconds)}<br>Allure moyenne : ${paceFmt(a.avgPace)}`;
+  if(a.avgHr)html+='<br>FC moyenne estimée : '+Math.round(a.avgHr)+' bpm';
+  if(a.splits.length)html+='<br><br><strong>Tours TCX</strong><br>'+a.splits.map((s,i)=>`${i+1}. ${(s.distance/1000).toFixed(2)} km — ${paceFmt(s.pace)}`).join('<br>');
+  html+='<div class="actions"><button class="btn" id="attach">Associer et noter</button></div>';
+  $('importResult').innerHTML=html;
+  $('attach').onclick=attachActivity;
+ }catch(e){$('importResult').textContent='Erreur : '+e.message}
+};
+
+function attachActivity(){
+ if(!selectedId||!pendingActivity){$('importResult').textContent='Sélectionne d’abord une séance dans Historique.';return}
+ const w=workouts.find(x=>x.id===selectedId),a=pendingActivity;
+ const durationRatio=Math.min(a.timeSeconds/w.estimatedSeconds,w.estimatedSeconds/a.timeSeconds);
+ const distanceRatio=Math.min(a.distanceKm/w.distance,w.distance/a.distanceKm);
+ const paceScore=Math.max(0,10-Math.abs(a.avgPace-w.pace)/w.pace*35);
+ w.activity=a;
+ w.score=Math.max(1,Math.min(10,Math.round((paceScore*.35+distanceRatio*10*.35+durationRatio*10*.30)*10)/10));
+ persist();
+ $('importResult').innerHTML=`<span class="score">${w.score}/10</span><br>Activité associée. Note indicative basée sur l'allure moyenne, la distance et la durée.`;
+ pendingActivity=null;
+}
+
+$('unit').onchange=()=>{
+ $('distance').value=$('unit').value==='m'?400:1;
+ calculate();
+};
+calculate();
+render();
+</script>
+</body>
+</html>
